@@ -11,6 +11,8 @@ namespace DefaultNamespace
         private int hp;
         private int hp2;
 
+        private float spawnTime;
+        
         public void Reset()
         {
             m_stringsSpells.Clear();
@@ -19,11 +21,17 @@ namespace DefaultNamespace
             hp = 0;
             hp2 = 0;
             gameObject.SetActive(true);
+            spawnTime = 2f; 
         }
         
         void Update()
         {
-            
+            spawnTime -= Time.deltaTime;
+
+            if (spawnTime < 0)
+            {
+                PoolManager.AddToPool(this);
+            }
         }
     }
 }

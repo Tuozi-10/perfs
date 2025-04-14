@@ -10,7 +10,7 @@ public class TestPerfs : MonoBehaviour
     [SerializeField] private GameObject instance;
     
     private float lastSpawn;
-    private const int delaySpawn = 1;
+    private const float delaySpawn = .1f;
 
     // Update is called once per frame
     void Update()
