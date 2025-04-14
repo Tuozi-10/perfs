@@ -1,20 +1,26 @@
 using System.Collections.Generic;
 using System.Text;
+using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Profiling;
 
 public class TestPerfs : MonoBehaviour
 {
+
+    [SerializeField] private GameObject instance;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    private float lastSpawn;
+    private const int delaySpawn = 1;
 
     // Update is called once per frame
     void Update()
     {
+        if (Time.time - lastSpawn > delaySpawn)
+        {
+            lastSpawn = Time.time;
+            PoolManager.GetOrCreate();
+        }
+        
         if (Input.GetKeyDown(KeyCode.Keypad0))
         {
             DoStuffOnStrings();
@@ -33,11 +39,7 @@ public class TestPerfs : MonoBehaviour
                 
         if (Input.GetKeyDown(KeyCode.Keypad3))
         {
-            DoStuffOnStrings();
-            DoLotOfStuffOnStrings();
             DoLotOfStuffOnStringsWithCapacity();
-            DoLotOfStuffOnStringsWithCapacityAndLocalVar();
-            DoLotOfStuffOnStringsWithCapacityAndInterpolation();
         }
         
         if (Input.GetKeyDown(KeyCode.Keypad4))
@@ -46,6 +48,12 @@ public class TestPerfs : MonoBehaviour
             DoLotOfStuffOnStrings();
             DoLotOfStuffOnStringBuilder();
             DoLotOfStuffOnStringBuilderInterpolation();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Keypad5))
+        {
+            DoString();
+            DoStringBuilder();
         }
     }
 
@@ -79,17 +87,16 @@ public class TestPerfs : MonoBehaviour
         Profiler.EndSample();
     }
     
+    List<string> allString = new List<string>(1500*100);
     private void DoLotOfStuffOnStringsWithCapacity()
     {
         Profiler.BeginSample("Test 3");
-        
-        var allString = new List<string>(1500*100);
-        
+        allString.Clear();
         for (int j = 0; j < 100; j++)
         {
             for (int i = 0; i < 1500; i++)
             {
-                allString.Add("unMot" + i);
+                allString.Add("unMot");
             }
         }
         Profiler.EndSample();
@@ -154,6 +161,58 @@ public class TestPerfs : MonoBehaviour
             }
         }
         Profiler.EndSample();
+    }
+    
+    private void DoString()
+    {
+        Profiler.BeginSample("Test 100");
+
+        string s = "";
+        
+        for (int j = 0; j < 100; j++)
+        {
+            for (int i = 0; i < 1500; i++)
+            {
+                s += $"unMot";
+            }
+        }
+        
+        Profiler.EndSample();
+    }
+    
+    private void DoStringBuilder()
+    {
+        Profiler.BeginSample("Test 101");
+        
+        var builder = new StringBuilder();
+
+        string caca = "";
+        Debug.Log(caca);
+        
+        Debug.Log(builder.ToString());
+        
+        for (int j = 0; j < 100; j++)
+        {
+            for (int i = 0; i < 1500; i++)
+            {
+                builder.Append($"unMot");
+            }
+        }
+        
+        Profiler.EndSample();
+    }
+
+    void GetComponentTest()
+    {
+        for (int j = 0; j < 100; j++)
+        {
+            GetComponent<Transform>();
+
+            if (TryGetComponent<Transform>(out Transform t))
+            {
+                t.position = Vector3.down;
+            }
+        }
     }
     
 }
